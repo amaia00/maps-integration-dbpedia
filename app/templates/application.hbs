@@ -1,7 +1,19 @@
-{{!-- The following component displays Ember's default welcome message. --}}
 
-{{#leaflet-map lat=lat lng=lng zoom=zoom}}
-{{!-- Specify child layer components here --}}
-    {{tile-layer url="http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"}}
-{{/leaflet-map}}
+<div class="head_page"></div>
+<div class="header">
+    <div class="university"><img alt="universite" src="university.png"/></div>
+    <div class="osm"></div>
+</div>
+<div style="clear: both"></div>
+<div class="content">
+<ul class="nav nav-tabs menu">
+    {{#link-to 'search' tagName="li" role="presentation" class="search"}}
+        {{fa-icon "fa-search" size="lg"}} <span>Search</span>
+    {{/link-to}}
+    {{#link-to 'map'  tagName="li" class="map" role="presentation"}}
+        {{fa-icon "map-marker" size="lg"}}<span>Map</span>
+    {{/link-to}}
+</ul>
+</div>
+
 {{outlet}}

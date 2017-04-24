@@ -1,0 +1,154 @@
+@import "ember-bootstrap/bootstrap";
+@color_bleu : #0A2EC1;
+@color_blanc: #fff;
+@color_gris : #eee;
+@color_noir: #000;
+@color_bleu_ciel: #1AA1DB;
+.calc(@prop; @val) {
+    @{prop}: calc(~'@{val}');
+    @{prop}: -moz-calc(~'@{val}');
+    @{prop}: -webkit-calc(~'@{val}');
+    @{prop}: -o-calc(~'@{val}');
+}
+
+.rounded-corners (@radius: 5px) {
+  -webkit-border-radius: @radius;
+  -moz-border-radius: @radius;
+  border-radius: @radius;
+}
+
+body {
+  background: url('background.jpg');
+  background-size: cover;
+}
+.head_page{
+  width: 100%;
+  height: 50px;
+  background: @color_bleu;
+}
+.university {
+  width: 150px;
+  margin: 0 auto;
+  margin-top: -60px;
+  background: @color_blanc;
+
+  img {
+    width:100%;
+  }
+
+}
+.menu li {
+  width: 100px;
+  position: relative;
+  padding: 10px 0;
+}
+.menu li span , .menu li i{
+  display: block;
+  text-align: center;
+}
+.menu li {
+
+  i {
+    font-size: 23px;
+    background: @color_bleu;
+    width: 30px;
+    height: 30px;
+    .rounded-corners(30px);
+    text-align: center;
+    line-height: 30px;
+    color: @color_blanc;
+    margin: 0 auto;
+  }
+  span {
+    font-size: 16px;
+  }
+}
+
+.menu li::before {
+  content: "";
+  width: 2px;
+  height: 20px;
+  background: @color_bleu;
+  display: block;
+  position: absolute;
+  bottom: 0;
+  top: 0;
+  right: 0;
+  margin: auto;
+
+}
+.menu li.active::after , .menu li:hover::after {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 50px 50px 0 50px;
+  border-color: @color_bleu transparent transparent transparent;
+  display: block;
+  position: absolute;
+  content: " ";
+  bottom: -50px;
+  z-index: 99999999;
+}
+.menu li.active, .menu li:hover {
+  background: @color_bleu !important;
+  border: 0 !important;
+  color: @color_blanc !important;
+  .rounded-corners(0);
+  margin-top: -10px;
+  height: 85px;
+  box-shadow: 1px -1px 10px @color_noir;
+}
+.menu li.active i , .menu li:hover i {
+  background: @color_blanc;
+  color: @color_bleu;
+}
+.content {
+  .calc(width; "100% - 300px");
+  margin:0 auto;
+  background: @color_blanc;
+}
+.content_boy {
+  padding: 20px;
+  text-align: center;
+
+  h6 {
+    text-align: center;
+    font-size: 36px;
+    font-weight: bold;
+    margin: 20px auto 40px auto;
+    color:@color_bleu_ciel;
+    text-shadow: 1px 1px 2px @color_bleu;
+  }
+  #basic-addon1 {
+    background: @color_bleu;
+    border-color: @color_bleu;
+    color: @color_blanc;
+    font-size: 14px;
+  }
+  .input-group {
+    width: 70%;
+    margin: 10px auto;
+  }
+  .search_btn {
+    background: @color_bleu_ciel;
+    color: @color_blanc;
+    margin: 20px auto;
+    width: 300Px;
+    font-size: 15px;
+
+    i {
+      margin-right: 10px;
+    }
+  }
+}
+.menu {
+  background: @color_gris;
+
+}
+.leaflet-container {
+  height: 500px;
+}
+#input_form {
+  border-color: @color_bleu;
+  height: 45px;
+}
