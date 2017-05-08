@@ -14,6 +14,7 @@ export default Ember.Controller.extend({
     geoJSON: null,
     ajax: Ember.inject.service(),
     universities: null,
+    osmUniversityJSON: null,
 
     actions: {
 
@@ -145,7 +146,7 @@ export default Ember.Controller.extend({
             out;
             */
             const query = [
-                '[out:json][timeout:30];\n',
+                '[timeout:30];\n',
                 'area[name="Villeurbanne"];\n',
                 'node(area);\n',
                 'way(around:100)[amenity=university];\n',
@@ -172,7 +173,8 @@ export default Ember.Controller.extend({
                     console.debug("findAllUniversitiesByCityOverpass: ", data);
                 }
                 // TODO add markers dans le map
-
+                const geojson = new OsmToGeoJson(data);
+                this.set('osmUniversityJSON', JSON.parse(JSON.stringify(geojson)));
 
             }).catch(function (error) {
 

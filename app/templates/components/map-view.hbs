@@ -9,6 +9,10 @@
         {{tile-layer url="http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"}}
         {{geojson-layer geoJSON=geoJSON}}
 
+        {{#if osmUniversityJSON}}
+            {{geojson-layer geoJSON=osmUniversityJSON}}
+        {{/if}}
+
         {{#each universities as |university|}}
             {{log "univ" university.coordinates}}
             {{#marker-layer location=university.coordinates icon=(icon
