@@ -4,10 +4,11 @@ import OsmToGeoJson from 'npm:osmtogeojson';
 
 const API_DBPEDIA_URL = 'https://dbpedia.org/sparql';
 const API_OVERPASS = 'http://overpass-api.de/api/interpreter';
-const DEBUG = false;
+const DEBUG = true;
+const AROUND_OVERPASS = 100;
 
 export default Ember.Controller.extend({
-    lat: 48.856700897217,
+    lat: 48.856700897217,  //TODO CENTER!!!
     lng: 2.350800037384,
     zoom: 9,
     geoJSON: null,
@@ -44,6 +45,7 @@ export default Ember.Controller.extend({
                 const geojson = new OsmToGeoJson(data);
                 this.set('geoJSON', JSON.parse(JSON.stringify(geojson)));
                 this.send('findAllUniversitiesByCityDBPedia', cityName);
+                this.send('findAllUniversitiesByCityOverpass', cityName);
 
 
             }).catch(function (error) {
@@ -59,16 +61,6 @@ export default Ember.Controller.extend({
                 // other errors are handled elsewhere
                 throw error;
             });
-        },
-
-        showArea(geojson) {
-            "use strict";
-            if (DEBUG) {
-                console.debug("showArea geojson: ", geojson);
-            }
-            this.set('geoJSON', this.geojson);
-
-            return this.geojson;
         },
 
         /**
@@ -121,7 +113,8 @@ export default Ember.Controller.extend({
                             name: data.results.bindings[element].univ.value,
                             coordinates: [data.results.bindings[element].lat.value ,data.results.bindings[element].long.value],
                             website: website,
-                            students: students
+                            students: students,
+                            provider: 'DBPEDIA'
                         });
                     }
                 }
@@ -141,5 +134,59 @@ export default Ember.Controller.extend({
             });
 
         },
+        findAllUniversitiesByCityOverpass(cityName) {
+            /*
+             area[name="Villeurbanne"];
+             node(area);
+             way(around:100)[amenity=university];
+
+            (._;>;);
+
+            out;
+            */
+            const query = [
+                '[out:json][timeout:30];\n',
+                'area[name="Villeurbanne"];\n',
+                'node(area);\n',
+                'way(around:100)[amenity=university];\n',
+                '(._;>;);\n',
+                'out;'
+            ].join("");
+
+            // const query = [
+            //     "[out:json][timeout:30];",
+            //     'area["boundary"~"administrative"]["name"~"' + cityName + '"];',
+            //     'node(area)["amenity"~"university"];',
+            //     'out;'
+            // ].join("");
+            if (DEBUG) {
+                console.debug("findAllUniversitiesByCityOverpass query", query);
+            }
+
+            this.get('ajax').request(API_OVERPASS + '?data=' + encodeURIComponent(query), {
+                method: 'GET',
+                dataType: 'xml',
+                crossDomain: true,
+            }).then((data) => {
+                if (DEBUG) {
+                    console.debug("findAllUniversitiesByCityOverpass: ", data);
+                }
+                // TODO add markers dans le map
+
+
+            }).catch(function (error) {
+
+                if (isNotFoundError(error)) {
+                    throw ("isNotFoundError");
+                }
+
+                if (isAjaxError(error)) {
+                    throw ("isAjaxError");
+                }
+
+                // other errors are handled elsewhere
+                throw error;
+            });
+        }
     }
 });

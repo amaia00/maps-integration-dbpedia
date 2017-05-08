@@ -1,0 +1,32 @@
+{{#if not geoJSON }}
+    {{#leaflet-map lat=lat lng=lng zoom=zoom}}
+        {{tile-layer url="http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"}}
+    {{/leaflet-map}}
+{{/if}}
+
+{{#if geoJSON }}
+    {{#leaflet-map lat=lat lng=lng zoom=zoom}}
+        {{tile-layer url="http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"}}
+        {{geojson-layer geoJSON=geoJSON}}
+
+        {{#each universities as |university|}}
+            {{log "univ" university.coordinates}}
+            {{#marker-layer location=university.coordinates icon=(icon
+                    iconUrl="https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png"
+                    iconRetinaUrl="https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png"
+                    iconSize=(point 25 41)
+                    iconAnchor=(point 12 41)
+                    popupAnchor=(point 1 -34)
+                    shadowUrl="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png"
+                    shadowSize=(point 41 41)
+            ) }}
+                {{#popup-layer}}
+                    <h3>{{university.name}}</h3>
+                    <a target="_blank" href="{{university.website}}">{{university.website}}</a> <br>
+                    Nombre d'étudiants: {{university.students}}
+                {{/popup-layer}}
+            {{/marker-layer}}
+        {{/each}}
+    {{/leaflet-map}}
+{{/if}}
+{{yield}}

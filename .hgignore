@@ -6,3 +6,4 @@ tmp
 .editorconfig
 .watchmanconfig
 dist
+bower_components
