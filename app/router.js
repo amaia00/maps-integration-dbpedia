@@ -8,8 +8,7 @@ const Router = Ember.Router.extend({
 
 Router.map(function() {
   this.route('search', { path: '/' });
-  // this.route('search');
-  this.route('map', { path: '/#map' });
+  this.route('map', { path: '/map/:osmType/:osmId/:cityName/:lat/:long' });
 });
 
 export default Router;

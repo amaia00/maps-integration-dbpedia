@@ -3,10 +3,11 @@
     <form>
         <div class="input-group">
             <span class="input-group-addon" id="basic-addon1">Nom du lieu</span>
-            <input id="input_form" type="text" class="form-control" placeholder="Ville, pays ou région" aria-describedby="basic-addon1">
+            {{input id="input_form" autofocus="autofocus" type="text" class="form-control"
+                    placeholder="Ville, pays ou région" aria-describedby="basic-addon1" value=cityName}}
         </div>
 
-        <button type="button" class="btn search_btn">{{fa-icon "fa-search"}}Rechercher</button>
+        <button {{action "findEntityOSMOfCity" cityName}} class="btn search_btn">{{fa-icon "fa-search"}}Rechercher</button>
 
 
     </form>
