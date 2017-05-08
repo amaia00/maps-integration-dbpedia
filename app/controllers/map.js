@@ -3,14 +3,14 @@ import {isAjaxError, isNotFoundError} from 'ember-ajax/errors';
 import OsmToGeoJson from 'npm:osmtogeojson';
 
 const API_DBPEDIA_URL = 'https://dbpedia.org/sparql';
-const API_OVERPASS = 'http://overpass-api.de/api/interpreter';
-const DEBUG = true;
-const AROUND_OVERPASS = 100;
+const API_OVERPASS = 'http://overpass-api.de/api/';
+const DEBUG = false;
+const TIMEOUT = 60;
 
 export default Ember.Controller.extend({
     lat: 48.856700897217,  //TODO CENTER!!!
     lng: 2.350800037384,
-    zoom: 9,
+    zoom: 12,
     geoJSON: null,
     ajax: Ember.inject.service(),
     universities: null,
@@ -28,13 +28,13 @@ export default Ember.Controller.extend({
          */
         findAllPointsByIdEntity(osmType, osmId, cityName, lat, long) {
             "use strict";
-            console.log("LAT LONG",lat, long);
             this.set('lat', lat);
             this.set('long', long);
 
-            this.get('ajax').request(API_OVERPASS, {
+            this.get('ajax').request(API_OVERPASS + 'interpreter', {
                 method: 'GET',
                 dataType: 'xml',
+                crossDomain:true,
                 data: {
                     data: osmType + '(' + osmId + ');(._;>;);out;'
                 }
@@ -95,7 +95,8 @@ export default Ember.Controller.extend({
 
             this.get('ajax').request(API_DBPEDIA_URL + '?query=' + encodeURIComponent(query.join(" ")) + '&format=json', {
                 method: 'GET',
-                dataType: 'json'
+                dataType: 'json',
+                crossDomain:true,
             }).then((data) => {
                 let universities = [];
                 for (const element in data.results.bindings) {
@@ -112,7 +113,7 @@ export default Ember.Controller.extend({
 
                         universities.push({
                             name: data.results.bindings[element].univ.value,
-                            coordinates: [data.results.bindings[element].lat.value ,data.results.bindings[element].long.value],
+                            coordinates: [data.results.bindings[element].lat.value, data.results.bindings[element].long.value],
                             website: website,
                             students: students,
                             provider: 'DBPEDIA'
@@ -135,22 +136,16 @@ export default Ember.Controller.extend({
             });
 
         },
+
         findAllUniversitiesByCityOverpass(cityName) {
-            /*
-             area[name="Villeurbanne"];
-             node(area);
-             way(around:100)[amenity=university];
+            "use strict";
+            //[out:json][timeout:30];area["boundary"~"administrative"]["name"~"Lyon"];node(area)["amenity"~"university"];out;
 
-            (._;>;);
 
-            out;
-            */
             const query = [
-                '[timeout:30];\n',
-                'area[name="Villeurbanne"];\n',
-                'node(area);\n',
-                'way(around:100)[amenity=university];\n',
-                '(._;>;);\n',
+                '[out:json][timeout:' + TIMEOUT + '];\n',
+                'area["boundary"~"administrative"]["name"~"' + cityName + '"];\n',
+                'node(area)["amenity"~"university"];\n',
                 'out;'
             ].join("");
 
@@ -161,32 +156,50 @@ export default Ember.Controller.extend({
             //     'out;'
             // ].join("");
             if (DEBUG) {
-                console.debug("findAllUniversitiesByCityOverpass query", query);
+                console.debug("findAllUniversitiesByCityOverpass2 query", query);
             }
 
-            this.get('ajax').request(API_OVERPASS + '?data=' + encodeURIComponent(query), {
+            this.get('ajax').request(API_OVERPASS + 'interpreter?data=' + encodeURIComponent(query), {
                 method: 'GET',
-                dataType: 'xml',
                 crossDomain: true,
             }).then((data) => {
                 if (DEBUG) {
-                    console.debug("findAllUniversitiesByCityOverpass: ", data);
+                    console.debug("findAllUniversitiesByCityOverpass2: ", data);
                 }
-                // TODO add markers dans le map
-                const geojson = new OsmToGeoJson(data);
-                this.set('osmUniversityJSON', JSON.parse(JSON.stringify(geojson)));
+
+                const osmUniversityJSON = [];
+
+                for (const node in data.elements) {
+                    try {
+                        if (data.elements.hasOwnProperty(node)) {
+
+                            let website = '';
+                            if (data.elements[node].tags.hasOwnProperty('website')) {
+                                website = data.elements[node].tags.website;
+                            }
+
+                            let phone = '';
+                            if (data.elements[node].tags.hasOwnProperty('phone')) {
+                                phone = data.elements[node].tags.phone;
+                            }
+
+                            osmUniversityJSON.push({
+                                name: data.elements[node].tags.name,
+                                coordinates: [data.elements[node].lat, data.elements[node].lon],
+                                website: website,
+                                phone: phone,
+                                provider: 'OSM'
+                            });
+
+                        }
+                    } catch (e) {}
+
+                }
+                this.set('osmUniversityJSON', osmUniversityJSON);
 
             }).catch(function (error) {
+                this.get('ajax').request(API_OVERPASS + 'kill_my_queries');
 
-                if (isNotFoundError(error)) {
-                    throw ("isNotFoundError");
-                }
-
-                if (isAjaxError(error)) {
-                    throw ("isAjaxError");
-                }
-
-                // other errors are handled elsewhere
                 throw error;
             });
         }

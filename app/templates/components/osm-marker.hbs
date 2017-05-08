@@ -1,0 +1,18 @@
+{{#each universities as |university|}}
+    {{#marker-layer location=university.coordinates icon=(icon
+            iconUrl="https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png"
+            iconRetinaUrl="https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png"
+            iconSize=(point 25 41)
+            iconAnchor=(point 12 41)
+            popupAnchor=(point 1 -34)
+            shadowUrl="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png"
+            shadowSize=(point 41 41)
+    ) }}
+        {{#popup-layer}}
+            <h3>{{university.name}}</h3>
+            <a target="_blank" href="{{university.website}}">{{university.website}}</a> <br>
+            Phone: {{university.phone}} <br/>
+            Fournisseur: {{university.provider}}
+        {{/popup-layer}}
+    {{/marker-layer}}
+{{/each}}
